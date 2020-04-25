@@ -1,134 +1,199 @@
-# Documentation:
+# DogeCash run masternode:
 
-_Our cluster contain MASTER which used as reference and SLAVES  which are connected to MASTER._
+_This is alpha release, valid for single node VPS setup._
 
-_MASTER image include extra packages like 'unzip' and 'curl' for maintenance and adjustments._
+**Pull images from docker hub:**
 
-__Pull images from docker hub:__
 ```docker
-docker pull dogecash/testnet-master:alpha
-docker pull dogecash/testnet-slave:alpha
+docker pull dogecash/master_x64:alpha
 ```
-__Check which images are available on our host:__
-```sh
+
+**Check which images are available on host:**
+
+```docker
 docker images
 ```
-__Run image persistently:__
-```sh
-docker run -it -d --name MASTER <MASTER_IMAGE_ID>
-```
-__Check if MASTER container is up and running:__
-```sh
-docker ps
-```
-__Start *MASTER*:__
-```sh
-docker exec -u dogecash -it MASTER run.sh
-```
-__Check log:__
-```sh
-docker exec -it MASTER tail -f /home/dogecash/.dogecash/debug.log
-```
-__Connect to bash in case we need to change anything:__
-```sh
-docker exec -u dogecash -it MASTER bash
-```
-__Stop container gently:__
-```sh
-docker stop --time=45 SLAVE
-```
-__After we sure MASTER is ready, go ahead and run *SLAVE* peer.__
 
-_Instructions are the same, except we need to provide MASTER IP for communication._
+**Run image persistently:**
 
 ```docker
-docker run -it -d --name SLAVE <SLAVE_IMAGE_ID>
+docker run -it -d -p 56740:56740 --name MASTER <IMAGE_ID>
+```
+
+**Check if MASTER container is up and running:**
+
+```docker
 docker ps
 ```
-__Rheck MASTER container IP address:__
+
+**Start configuration script, we need to provide masternode private key:**
+
+```bash
+docker exec -u 0 -it MASTER dogecash.sh <MASTERNODE PRIVATE KEY HERE>
+```
+
+_Script will download full chain, which can take a long time, depends on your internet connection._
+
+**Start masternode:**
+
+```bash
+docker exec -u dogecash -it MASTER run.sh
+```
+
+**Now we can check debug.log use Ctrl+C to exit, pay attention on ACCEPT messages:**
+
+```bash
+docker exec -it MASTER tail -f /home/dogecash/.dogecash/debug.log
+```
+
+# Scripts & Tools documentation:
+
+_Most of this tools should be run as root except bootstrap.sh ( -u 0 )_
+
+**dogecash.sh**
+
+Oneliner all in one setup to run masternode and instantly sync with network.
+
+Is mandatory recommendation to use this script and avoid any adition setup manipulations.
+
+It will download full chain snapshot, can take a long time depands on connection speed.
+With modern VPS providers should not take longer then a 10 minutes.
+
+_Only work as root:_
+
+```bash
+docker exec -u 0 -it MASTER dogecash.sh <MASTERNODE PRIVATE KEY HERE>
+```
+
+**config.sh**
+
+_Set up daemon configuration file, check for private masternode key,_
+_generate random RPC entries, and add up-to-date peers for fast synchronization._
+
+_Only work as root user:_
+
+```bash
+docker exec -u 0 -it MASTR config.sh <MASTERNODE_PRIVATE_KEY>
+```
+
+**snapshot.sh**
+
+_Wipe ALL chain storage and download full stapshot to provide up to block synchronisation._
+_Can take a long time depands on connection speed._
+_With modern VPS providers should not take longer then a 10 minutes._
+
+_bootstrap.dat will be deleted, so use in apropriate order !_
+
+_Only work as root user:_
+
+```bash
+docker exec -u 0 -it MASTER snapshot.sh
+```
+
+**bootstrap.sh**
+
+_Download bootstrap.dat in to DATA folder._
+_script will not wipe anything, so use wipe.sh before to support your needs._
+
+_Use with this command, should not run as root:_
+
+```bash
+docker exec -u dogecash -it MASTER bootstrap.sh
+```
+
+**wipe.sh**
+
+For advanced users only !
+
+_Will wipe all sort of data, depends on your needs, it can clear addnodes from config,_
+_wipe all chain storage, delete wllet.dat, delete bootstrap.dat.old to free some space, wipe daemon config._
+_I'm actually planing to wipe corona virus soon, more to come, stay tuna for updates._
+
+```
+wipe.sh stop          - stop daemon
+
+wipe.sh data          - remove all chain and database data
+wipe.sh wallet        - remove wallet.dat ( be careful! )
+wipe.sh old           - removing bootstrap.dat.old if present
+wipe.sh addnode       - remove all addnodes entry
+wipe.sh config        - remove everything from config, including private node key ( be careful! )
+```
+
+```bash
+docker exec -u 0 -it MAIN-NET wipe.sh <option1> <option2> <option3> <option4> ...
+```
+
+_Example:_
+
+```bash
+docker exec -u 0 -it MAIN-NET wipe.sh stop data addnode
+```
+
+# Debugging and additional commands:
+
+**Connect to bash in case we need to change something:**
+
+```bash
+docker exec -u dogecash -it MASTER bash
+```
+
+**Stop and Start container:**
+
+```docker
+docker stop --time=45 MASTR
+```
+
+_run container ( all data are saved ):_
+
+```docker
+docker start <CONTAINER_NAME_OR_ID>
+```
+
+**Get container IP address:**
+
 ```docker
 docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' MASTER
 ```
-__Provide *MASTER IP* of *SLAVE*:__
-```sh
-docker exec -t SLAVE config.sh 172.17.0.2
-```
 
-__Run *SLAVE*:__
+**Passing commands to container:**
+
 ```docker
-docker exec -u dogecash -it SLAVE run.sh
+docker exec -u dogecash -it MASTER dogecash-cli getinfo
+                ^^ -u 0 for root
+docker exec -u dogecash -it MASTER dogecash-cli getpeerinfo
+                                   ^^ everything after container.
 ```
 
-## Networking:
+**Check all containers including offline:**
 
-__Publish port:__
-```sh
-docker run -p 127.0.0.1:80:8080/tcp <IMAGE_ID> bash
-```
-__Expose port:__
-```sh
-docker run --expose 80 <NAME> bash
-```
-    
-## How to start offline containers after we wake up in the morning:
-
-__Check all containers:__
-```sh
+```docker
 docker container ls -a
 ```
-_run container ( all data are saved ), but we need to start daemon as described above_
-```sh
-docker start <NAME>
-```
-__If we need to run one command for all instances:__
-```sh
-for i in c1 dm1 dm2 ds1 ds2 gtm_m gtm_sl; do docker exec -u dogecash -it $i /bin/bash -c "whatever we need to do"; done
+
+**If we need to run one command for all instances:**
+
+```bash
+for i in c1 dm1 dm2 ds1 ds2 gtm_m gtm_sl; do docker exec -u <username> -it $i /bin/bash -c "whatever we need to do"; done
 ```
 
-## Development command:
-```sh
-docker system prune -af
-docker volume prune
-docker container prune
-```
-__Remove and clear:__
-```sh
+**Remove image for people with low HDD space:**
+
+```bash
 docker image rm -f <IMAGE NAME OR ID>
 ```
-__List all images:__
-```sh
-docker images -a
-```
 
-__Check logs:__
-```sh
-docker logs $container_id>
-```
+**Troubleshooting docker activity:**
 
-__Rename give a name:__
-```sh
-docker tag dogecash:alpha dogecash/dogecash:alpha
-```
-
-__Troubleshooting docker activity:__
-```sh
+```docker
 sudo journalctl -u docker
 
 sudo journalctl -u docker -f
 
 journalctl -xn -u docker | less
 ```
-## Build containers:
-```sh
-cd MASTER
-sudo docker build -t dogecash/testnet-master:alpha .
 
-cd ../SVALE
-sudo docker build -t dogecash/testnet-slave:alpha .
+**Check logs:**
+
+```docker
+docker logs $container_id>
 ```
-
-
-
-__Good explanation about use of the VOLUME in my docker image if someone ask this question, thanks to Mr. Haven__
-
-Generaly good topic to read about this subject: https://stackoverflow.com/a/55052682
