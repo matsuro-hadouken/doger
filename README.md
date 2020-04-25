@@ -114,7 +114,7 @@ wipe.sh stop          - stop daemon
 
 wipe.sh data          - remove all chain and database data
 wipe.sh wallet        - remove wallet.dat ( be careful! )
-wipe.sh old           - removing bootstrap.dat.old if present
+wipe.sh bootstrap     - removing bootstrap* if present
 wipe.sh addnode       - remove all addnodes entry
 wipe.sh config        - remove everything from config, including private node key ( be careful! )
 ```
@@ -140,7 +140,7 @@ docker exec -u dogecash -it MASTER bash
 **Stop and Start container:**
 
 ```docker
-docker stop --time=45 MASTER
+docker stop --time=45 MASTR
 ```
 
 _run container ( all data are saved ):_
