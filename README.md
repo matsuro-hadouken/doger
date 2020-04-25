@@ -120,13 +120,13 @@ wipe.sh config        - remove everything from config, including private node ke
 ```
 
 ```bash
-docker exec -u 0 -it MAIN-NET wipe.sh <option1> <option2> <option3> <option4> ...
+docker exec -u 0 -it MASTER wipe.sh <option1> <option2> <option3> <option4> ...
 ```
 
 _Example:_
 
 ```bash
-docker exec -u 0 -it MAIN-NET wipe.sh stop data addnode
+docker exec -u 0 -it MASTER wipe.sh stop data addnode
 ```
 
 # Debugging and additional commands:
@@ -140,7 +140,7 @@ docker exec -u dogecash -it MASTER bash
 **Stop and Start container:**
 
 ```docker
-docker stop --time=45 MASTR
+docker stop --time=45 MASTER
 ```
 
 _run container ( all data are saved ):_
