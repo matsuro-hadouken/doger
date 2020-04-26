@@ -49,6 +49,16 @@ docker exec -u dogecash -it MASTER run.sh
 ```bash
 docker exec -it MASTER tail -f /home/dogecash/.dogecash/debug.log
 ```
+_It takes a while to start with docker and understand how it works, if you fail at some point,_
+_here is the way to start from scratch, this commands remove ALL DATA and bring docker to virgin state._
+
+```
+docker stop MASTER            - stop container by NAME
+
+docker system prune -a        - clear up all docker system
+docker volume prune           - remove all created volumes
+docker container prune        - remove all containers
+```
 
 # Scripts & Tools documentation:
 
