@@ -34,6 +34,7 @@ docker ps
 ```bash
 docker exec -u 0 -it MASTER dogecash.sh <MASTERNODE PRIVATE KEY HERE>
 ```
+![dogecash.sh](https://user-images.githubusercontent.com/50751381/80302833-fe0a7400-879b-11ea-9ca4-6f3deb82d55f.png)
 
 _Script will download full chain, which can take a long time, depends on your internet connection._
 
