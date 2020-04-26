@@ -13,7 +13,7 @@ docker pull dogecash/master_x64:alpha
 ```docker
 docker images
 ```
-![docker images] (https://user-images.githubusercontent.com/50751381/80302333-eaa9d980-8798-11ea-8644-5aaef52efc48.png)
+![docker_images](https://user-images.githubusercontent.com/50751381/80302333-eaa9d980-8798-11ea-8644-5aaef52efc48.png)
 
 **Run image persistently:**
 
