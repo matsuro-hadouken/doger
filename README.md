@@ -16,6 +16,7 @@ docker images
 ![docker_images](https://user-images.githubusercontent.com/50751381/80302333-eaa9d980-8798-11ea-8644-5aaef52efc48.png)
 
 **Run image persistently:**
+_we use name "MASTER" as example, can be any name, it doesn't meter._
 
 ```docker
 docker run -it -d -p 56740:56740 --name MASTER <IMAGE_ID>
