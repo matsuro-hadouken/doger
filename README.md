@@ -20,7 +20,7 @@ docker images
 ```docker
 docker run -it -d -p 56740:56740 --name MASTER <IMAGE_ID>
 ```
-
+![docker_run](https://user-images.githubusercontent.com/50751381/80302533-15e0f880-879a-11ea-8da3-0edd2cdd8b85.png)
 **Check if MASTER container is up and running:**
 
 ```docker
