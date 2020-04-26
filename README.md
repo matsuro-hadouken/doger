@@ -26,6 +26,7 @@ docker run -it -d -p 56740:56740 --name MASTER <IMAGE_ID>
 ```docker
 docker ps
 ```
+![docker ps]https://user-images.githubusercontent.com/50751381/80302655-d070fb00-879a-11ea-9826-ecfa23bdc7c7.png
 
 **Start configuration script, we need to provide masternode private key:**
 
