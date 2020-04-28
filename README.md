@@ -1,8 +1,8 @@
 # DogeCash run masternode:
 
-**Alpha Release**
+**Alpha documentation !**
 
-Pull images from docker hub:
+Pull MASTER image first from the hub:
 
 ```docker
 docker pull dogecash/main-master_x64
