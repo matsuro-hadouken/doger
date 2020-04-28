@@ -34,7 +34,7 @@ docker ps
 
 Start configuration script, we need to provide masternode private key and external IP address:
 
-_As VPS owner you should know you IP address, in case not use `curl ifconfig.me` or `curl ident.me`_
+_As VPS owner your should know you IP address, in case not use `curl ifconfig.me` or `curl ident.me`_
 
 ```bash
 docker exec -u 0 -it MASTER dogecash.sh 'MASTERNODE PRIV KEY' 'EXTERNAL IP'
@@ -42,7 +42,7 @@ docker exec -u 0 -it MASTER dogecash.sh 'MASTERNODE PRIV KEY' 'EXTERNAL IP'
 
 ![dogecash.sh](https://user-images.githubusercontent.com/50751381/80302833-fe0a7400-879b-11ea-9ca4-6f3deb82d55f.png)
 
-_Script start download of the full chain snapshot, which can take a long time, depends on your internet connection, for modern VPS host should not take more then 1 minute or 2._
+_Script start download of the full chain snapshot, that can take a long time, depends on your internet connection, for modern VPS host should not take more than 1 minute or 2._
 
 **Start masternode:**
 
@@ -58,13 +58,13 @@ docker exec -it MASTER tail -f /home/dogecash/.dogecash/debug.log
 
 **Here we should wit for MN to fully sync with the chain**
 
-By the time you reading this it should be already synced, to double check we ask daemon about his current block, by passing _getblockcount_ command:
+By the time you reading this it should be already synched, to double check we ask daemon about his current block, by passing _getblockcount_ command:
 
 ```bash
 docker exec -u dogecash -it MASTER dogecash-cli getblockcount
 ```
 
-Then check last block on explorer https://explorer.dogec.io/status and compare. Usually, daemon should be in atomic sync or around 1 ot 2 blocks behind which is acceptable lathensy in most cases.
+Then check last block on explorer https://explorer.dogec.io/status and compare. Usually, daemon should be in atomic sync or around 1 or 2 blocks behind which is acceptable latensy in most cases.
 
 **There comes a time when you have to choose between turning the page or just closing the book.**
 
@@ -74,7 +74,7 @@ If you want to run another node, we need to pull SLAVE image from the hub.
 docker pull dogecash/main-slave_x64
 ```
 
-_All steps same as we did with master container, except don't need to provide external IP and we will not open port to outside._
+_All steps are the same as we did with master container, except no need to provide external IP and we won't open port to outside._
 
 _Names can be absolutely your choice, like DOGE is the MASTER and COIN is a SLAVE, up to you. We going to use SLAVE as example._
 
@@ -94,7 +94,7 @@ Complete full configuration setup:
 docker exec -u 0 -it SLAVE dogecash.sh 'MASTERNODE PRIV KEY'
 ```
 
-_If you fail at some step or want to learn more by trying different utilitys included in the package, here is the way to start from scratch, this commands remove ALL containers and images data and bring docker to virgin state as it was just installed._
+_If you fail at some step or want to learn more by trying different utilitys included in the package, here is the way to start from scratch, these commands remove ALL containers and images data and bring docker to virgin state as it was just installed._
 
 ```
 docker stop MASTER      - stop container by NAME ( MASTER in this example )
@@ -104,7 +104,7 @@ docker volume prune     - remove all created volumes
 docker container prune  - remove all containers
 ```
 
-_notice: you should stop container before removing his data, otherwise only offline containers data will be removed._
+_notice: you should stop container before removing it's data, otherwise only offline containers data will be removed._
 
 # Tools documentation:
 
@@ -114,10 +114,10 @@ _dogecash.sh_
 
 Oneliner all in one setup to run masternode and instantly sync with network.
 
-Is mandatory recommendation to use this script and avoid any adition setup manipulations.
+It's mandatory recommendation to use this script and avoid any adition setup manipulations.
 
-It will download full chain snapshot, can take a long time depands on connection speed.
-With modern VPS providers should not take longer then a 10 minutes.
+It will download full chain snapshot, can take long time depands on connection speed.
+With modern VPS providers should not take longer than a 8 minutes.
 
 _Only work as root:_
 
@@ -139,8 +139,8 @@ docker exec -u 0 -it MASTR config.sh <MASTERNODE_PRIVATE_KEY>
 _snapshot.sh_
 
 _Wipe ALL chain storage and download full stapshot to provide up to block synchronisation._
-_Can take a long time depands on connection speed._
-_With modern VPS providers should not take longer then a 10 minutes._
+_Can take a long time depends on connection speed._
+_With modern VPS providers should not take longer than a 8 minutes._
 
 _bootstrap.dat will be deleted, so use in apropriate order !_
 
@@ -165,7 +165,7 @@ _wipe.sh_
 
 For advanced users only !
 
-_Script will wipe all sord of things, depends on your needs, it can clear addnodes from config, wipe all chain data, delete wllet.dat, delete bootstrap.dat.old or bootstrap.dat to free space above 200M, wipe daemon config to initial stage._
+_Script will wipe all sort of things, depends on your needs, it can clear addnodes from config, wipe all chain data, delete wllet.dat, delete bootstrap.dat.old or bootstrap.dat to free space above 200M, wipe daemon config to initial stage._
 
 available commands:
 
