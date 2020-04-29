@@ -1,12 +1,14 @@
 # DogeCash run masternode:
 
-**Alpha documentation !**
+**Alpha documentation for testers and advanced users**
 
 Pull MASTER image first from the hub:
 
 ```docker
 docker pull dogecash/main-master_x64
 ```
+
+_( **expand terminal window for better redability** )_
 
 Check which images are available on host:
 
