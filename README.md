@@ -8,7 +8,7 @@ Pull MASTER image first from the hub:
 docker pull dogecash/main-master_x64
 ```
 
-Check which images are available on host:
+Check which images are available on the host:
 
 ```docker
 docker images
@@ -32,9 +32,9 @@ docker ps
 
 ![docker ps](https://user-images.githubusercontent.com/50751381/80302655-d070fb00-879a-11ea-9826-ecfa23bdc7c7.png)
 
-Start configuration script, we need to provide masternode private key and external IP address:
+Start configuration script, we need to provide a masternode private key and external IP address:
 
-_As VPS owner your should know you IP address, in case not use `curl ifconfig.me` or `curl ident.me`_
+_As VPS owner your should know your IP address, in case not use `curl ifconfig.me` or `curl ident.me`_
 
 ```bash
 docker exec -u 0 -it MASTER dogecash.sh 'MASTERNODE PRIV KEY' 'EXTERNAL IP'
@@ -42,7 +42,7 @@ docker exec -u 0 -it MASTER dogecash.sh 'MASTERNODE PRIV KEY' 'EXTERNAL IP'
 
 ![dogecash.sh](https://user-images.githubusercontent.com/50751381/80302833-fe0a7400-879b-11ea-9ca4-6f3deb82d55f.png)
 
-_Script start download of the full chain snapshot, that can take a long time, depends on your internet connection, for modern VPS host should not take more than 1 minute or 2._
+_Script starts download of the full chain snapshot, that can take a long time, depending on your internet connection, for modern VPS host it should not take more than 1 minute or 2._
 
 **Start masternode:**
 
@@ -50,21 +50,21 @@ _Script start download of the full chain snapshot, that can take a long time, de
 docker exec -u dogecash -it MASTER run.sh
 ```
 
-Now we can check log in real time, use Ctrl+C to exit:
+Now we can check the log in real time, use Ctrl+C to exit:
 
 ```bash
 docker exec -it MASTER tail -f /home/dogecash/.dogecash/debug.log
 ```
 
-**Here we should wit for MN to fully sync with the chain**
+**Here we should wait for the MN to fully sync with the chain**
 
-By the time you reading this it should be already synched, to double check we ask daemon about his current block, by passing _getblockcount_ command:
+By the time you are done reading this it should be already synched, to double check we ask the daemon about his current block, by passing _getblockcount_ command:
 
 ```bash
 docker exec -u dogecash -it MASTER dogecash-cli getblockcount
 ```
 
-Then check last block on explorer https://explorer.dogec.io/status and compare. Usually, daemon should be in atomic sync or around 1 or 2 blocks behind which is acceptable latensy in most cases.
+Then check last block on explorer https://explorer.dogec.io/status and compare. Usually, daemon should be in atomic sync or around 1 or 2 blocks behind which is acceptable latency in most cases.
 
 **There comes a time when you have to choose between turning the page or just closing the book.**
 
@@ -78,7 +78,7 @@ _All steps are the same as we did with master container, except no need to provi
 
 _Names can be absolutely your choice, like DOGE is the MASTER and COIN is a SLAVE, up to you. We going to use SLAVE as example._
 
-Check awailable containers:
+Check available containers:
 
 ```bash
 docker images
@@ -94,7 +94,7 @@ Complete full configuration setup:
 docker exec -u 0 -it SLAVE dogecash.sh 'MASTERNODE PRIV KEY'
 ```
 
-_If you fail at some step or want to learn more by trying different utilitys included in the package, here is the way to start from scratch, these commands remove ALL containers and images data and bring docker to virgin state as it was just installed._
+_If you fail at some step or want to learn more by trying different utilities included in the package, here is the way to start from scratch, these commands remove ALL containers and images data and bring docker to virgin state as if it was just installed._
 
 ```
 docker stop MASTER      - stop container by NAME ( MASTER in this example )
@@ -112,14 +112,14 @@ _Most of this tools should be run as root except bootstrap.sh ( -u 0 )_
 
 _dogecash.sh_
 
-Oneliner all in one setup to run masternode and instantly sync with network.
+One liner all in one setup to run masternode and instantly sync with network.
 
-It's mandatory recommendation to use this script and avoid any adition setup manipulations.
+It's a mandatory recommendation to use this script and avoid any additional setup manipulations.
 
-It will download full chain snapshot, can take long time depands on connection speed.
-With modern VPS providers should not take longer than a 8 minutes.
+It will download full chain snapshot, it can take long time and it depends on connection speed.
+With modern VPS providers should not take longer than about 8 minutes.
 
-_Only work as root:_
+_Only works as root:_
 
 ```bash
 docker exec -u 0 -it MASTER dogecash.sh <MASTERNODE PRIVATE KEY HERE>
@@ -130,7 +130,7 @@ _config.sh_
 _Set up daemon configuration file, check for private masternode key,_
 _generate random RPC entries, and add up-to-date peers for fast synchronization._
 
-_Only work as root user:_
+_Only works as root user:_
 
 ```bash
 docker exec -u 0 -it MASTR config.sh <MASTERNODE_PRIVATE_KEY>
@@ -139,12 +139,12 @@ docker exec -u 0 -it MASTR config.sh <MASTERNODE_PRIVATE_KEY>
 _snapshot.sh_
 
 _Wipe ALL chain storage and download full stapshot to provide up to block synchronisation._
-_Can take a long time depends on connection speed._
-_With modern VPS providers should not take longer than a 8 minutes._
+_Can take a long time, it depends on connection speed._
+_With modern VPS providers should not take longer than about 8 minutes._
 
-_bootstrap.dat will be deleted, so use in apropriate order !_
+_bootstrap.dat will be deleted, so use in appropriate order !_
 
-_Only work as root user:_
+_Only works as root user:_
 
 ```bash
 docker exec -u 0 -it MASTER snapshot.sh
@@ -152,7 +152,7 @@ docker exec -u 0 -it MASTER snapshot.sh
 
 _bootstrap.sh_
 
-_Download bootstrap.dat in to DATA folder._
+_Download bootstrap.dat into the DATA folder._
 _script will not wipe anything, so use wipe.sh before to support your needs._
 
 _Use with this command, should not run as root:_
@@ -181,7 +181,7 @@ wipe.sh addnode - _remove all addnodes entry_
 
 wipe.sh config - _remove everything from config, including private node key ( becareful )_
 
-_If you wipe config this will make node malfunctional, so run config.sh to recreate or use dogecash.sh ( recommended )._
+_If you wipe config this will make node non-functional, so run config.sh to recreate or use dogecash.sh ( recommended )._
 
 This will only work as container root user:'
 
