@@ -11,9 +11,11 @@ function check_condition() {
 
     if [ -x "$(command -v docker)" ]; then
 
-        echo 'Docker is already installed on your system.'
-        echo 'Check for updates if neccessary.'
-        echo ''
+        echo 'Docker is already installed on your system.' && echo ''
+
+        docker -v || exit 1
+
+        echo '' && echo 'Check for updates if neccessary.' && echo ''
 
         exit 1
 
@@ -53,7 +55,7 @@ function debian_installation() {
 
     sudo apt-get update
 
-    sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+    sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common gnupg2
 
     curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 
@@ -63,7 +65,11 @@ function debian_installation() {
 
     sudo apt-get -y install docker-ce
 
+    echo ''
+
     docker -v || exit 1
+
+    echo '' && echo 'Docker successfully installed on your system.' && echo ''
 
 }
 
@@ -73,7 +79,7 @@ function ubuntu_installation() {
 
     sudo apt-get update
 
-    sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+    sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common gnupg2
 
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -83,7 +89,11 @@ function ubuntu_installation() {
 
     sudo apt-get -y install docker-ce
 
+    echo ''
+
     docker -v || exit 1
+
+    echo '' && echo 'Docker successfully installed on your system.' && echo ''
 
 }
 
@@ -98,3 +108,4 @@ if [ $? == 0 ]; then
 else
     ubuntu_installation
 fi
+
