@@ -1,0 +1,13 @@
+rpcallowip=127.0.0.1
+rpcallowip=172.17.0.1/24
+
+maxconnections=30
+printtoconsole=0
+logtimestamps=1
+
+server=1
+daemon=1
+
+testnet=1
+
+connect=172.17.0.2
