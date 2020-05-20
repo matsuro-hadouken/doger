@@ -66,7 +66,7 @@ function inputs() {
     ident_me=$(curl -s ident.me | tr -d '%')
 
     echo -e "${GREEN}ifconfig.me report: ${NC} $ifconfig_me"
-    echo -e "${GREEN}ident.me report: ${NC} $ident_me" && echo
+    echo -e "${GREEN}ident.me report:    ${NC} $ident_me" && echo
 
     echo -e "${RED}Please use IPv4 from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
 
@@ -167,6 +167,9 @@ function successs() {
     echo -e "${GREEN}Container best height:${NC}        $CONTAINER_HEIGHT" && echo
 
     echo -e "${GREEN}Masternode can be started from desktop wallet, done.${NC}" && echo
+
+    echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740 $PRIVAT_KEY collateral_txid collateral_index${NC}"
+
     echo -e "${RED}If this node get online, you will never ever need to run this script again.${NC}" && echo
     echo -e "${GREEN}Good luck.${NC}" && echo
 
