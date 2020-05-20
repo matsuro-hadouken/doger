@@ -6,12 +6,61 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-function check_condition() {
+function if_Root() {
 
     if [ "$(id -u)" != "0" ]; then
         echo -e "${RED}This script must be run as root.${NC}" 1>&2
         exit 1
     fi
+}
+
+function requirements() {
+
+    echo && echo -e "${GREEN}Checking and install required packages ...${NC}" && echo
+
+    REQUIRED_PKG="jq"
+
+    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG | grep "install ok installed")
+    echo Checking for $REQUIRED_PKG: $PKG_OK
+
+    if [ "" = "$PKG_OK" ]; then
+        echo "No $REQUIRED_PKG installed. Setting up $REQUIRED_PKG."
+        apt-get --yes install $REQUIRED_PKG
+    fi
+
+    REQUIRED_PKG="git"
+
+    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG | grep "install ok installed")
+    echo Checking for $REQUIRED_PKG: $PKG_OK
+
+    if [ "" = "$PKG_OK" ]; then
+        echo "No $REQUIRED_PKG installed. Setting up $REQUIRED_PKG."
+        apt-get --yes install $REQUIRED_PKG
+    fi
+
+    REQUIRED_PKG="curl"
+
+    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG | grep "install ok installed")
+    echo Checking for $REQUIRED_PKG: $PKG_OK
+
+    if [ "" = "$PKG_OK" ]; then
+        echo "No $REQUIRED_PKG installed. Setting up $REQUIRED_PKG."
+        apt-get --yes install $REQUIRED_PKG
+    fi
+
+    REQUIRED_PKG="wget"
+
+    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG | grep "install ok installed")
+    echo Checking for $REQUIRED_PKG: $PKG_OK
+
+    if [ "" = "$PKG_OK" ]; then
+        echo "No $REQUIRED_PKG installed. Setting up $REQUIRED_PKG."
+        apt-get --yes install $REQUIRED_PKG
+    fi
+
+}
+
+function if_Docker() {
 
     if [ -x "$(command -v docker)" ]; then
 
@@ -106,7 +155,11 @@ function distro() {
 
 }
 
-check_condition
+if_Root
+
+requirements
+
+if_Docker
 
 clear
 
