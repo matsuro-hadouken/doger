@@ -7,16 +7,18 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+COIN_NAME='dogecash'
+MASTER_CONTAINER_NAME='MASTER'
+
 LFB="unknown"
 CONTAINER_HEIGHT="0"
+
+MASTER_CONTAINER_HUB='dogecash/no-prompt-main-master_x64'
+SLAVE_CONTAINER_HUB='dogecash/no-prompt-main-slave_x64'
 
 numba='^[0-9]+$'
 
 EXPLORER_URL='https://explorer.dogec.io/api/v2'
-
-COIN_NAME='dogecash'
-
-MASTER_CONTAINER_NAME='MASTER'
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -63,7 +65,7 @@ function inputs() {
 
 function install_MASTER() {
 
-    echo -e "${RED}Stopping active containers and remove all data ...${NC}" && echo
+    echo -e "${RED}Stopping active containers and removing all docker data ...${NC}" && echo
 
     docker container stop "$(docker container list -qa)"
 
@@ -75,15 +77,15 @@ function install_MASTER() {
 
     # echo && echo -e "${GREEN}Pulling slave image from $COIN_NAME hub ...${NC}" && echo && sleep 2
 
-    # docker pull dogecash/main-slave_x64
+    # docker pull $SLAVE_CONTAINER_HUB
 
     echo && echo -e "${GREEN}Pulling master image from $COIN_NAME hub ...${NC}" && echo && sleep 2
 
-    docker pull dogecash/main-master_x64
+    docker pull $MASTER_CONTAINER_HUB
 
     echo && echo -e "${GREEN}$MASTER_CONTAINER_NAME container deploy, port 56740 should be available from outside.${NC}" && echo
 
-    docker run -it -d -p 56740:56740 --name $MASTER_CONTAINER_NAME dogecash/main-master_x64
+    docker run -it -d -p 56740:56740 --name $MASTER_CONTAINER_NAME "$MASTER_CONTAINER_HUB"
 
     sleep 3
 
