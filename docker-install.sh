@@ -11,11 +11,11 @@ function check_condition() {
 
     if [ -x "$(command -v docker)" ]; then
 
-        echo 'Docker is already installed on your system.' && echo ''
+        echo 'Docker is already installed on your system.' && echo
 
         docker -v || exit 1
 
-        echo '' && echo 'Check for updates if neccessary.' && echo ''
+        echo && echo 'Check for updates if neccessary.' && echo
 
         exit 1
 
@@ -24,11 +24,8 @@ function check_condition() {
     if ! uname -m | grep -q 'x86_64'; then
 
         {
-
             echo 'ERROR: Designed for x86_64 architecture.'
-
             exit 1
-
         }
 
     fi
@@ -42,7 +39,7 @@ cat <<EOL
 DogeCash Docker Installer:
 
 Debian and Ubuntu x86_64 only supported, If you on different OS,
-then use DuckDuckGo search for instruction on how to install
+then use DuckDuckGo.com, search for instruction on how to install
 docker for your distribution.
 
 EOL
@@ -65,11 +62,11 @@ function debian_installation() {
 
     sudo apt-get -y install docker-ce
 
-    echo ''
+    echo
 
     docker -v || exit 1
 
-    echo '' && echo 'Docker successfully installed on your system.' && echo ''
+    echo && echo 'Docker successfully installed on your system.' && echo
 
 }
 
@@ -89,23 +86,34 @@ function ubuntu_installation() {
 
     sudo apt-get -y install docker-ce
 
-    echo ''
+    echo
 
     docker -v || exit 1
 
-    echo '' && echo 'Docker successfully installed on your system.' && echo ''
+    echo && echo 'Docker successfully installed on your system.' && echo
 
 }
 
 check_condition
 
-awk -F= '/^NAME/{print $2}' /etc/os-release | grep Debian
+function distro() {
 
-if [ $? == 0 ]; then
-    {
-        debian_installation
-    }
-else
-    ubuntu_installation
-fi
+    if (awk -F= '/^NAME/{print $2}' /etc/os-release | grep -q -o Debian); then
 
+        echo "debian_installation"
+
+    fi
+
+    if (awk -F= '/^NAME/{print $2}' /etc/os-release | grep -q -o Ubuntu); then
+
+        echo "ubuntu_installation"
+
+    else
+
+        echo && echo -e "${RED}You using different operation system which are not supported by this installation script.${NC}" && echo
+
+        exit 1
+
+    fi
+
+}
