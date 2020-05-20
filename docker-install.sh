@@ -127,6 +127,8 @@ function if_Docker() {
 
 function debian_installation() {
 
+    echo && echo -e "${RED}Next setup can take a long time, please take patience.${NC}"
+
     read -rp "Docker Debian installation. Ctrl-C to stop or any key to continue."
 
     sudo apt-get update
@@ -150,6 +152,8 @@ function debian_installation() {
 }
 
 function ubuntu_installation() {
+
+    echo && echo -e "${RED}Next setup can take a long time, please take patience.${NC}"
 
     read -rp "Docker Ubuntu installaton. Ctrl-C to stop or any key to continue."
 
