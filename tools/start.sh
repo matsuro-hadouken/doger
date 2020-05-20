@@ -75,15 +75,23 @@ function inputs() {
 
 function install_MASTER() {
 
-    echo -e "${RED}Stopping active containers and removing all docker data ...${NC}" && echo
+    echo -e "${RED}Stopping active containers and removing all docker data ...${NC}" && echo && sleep 2
 
     docker container stop "$(docker container list -qa)"
 
+    sleep 3
+
     docker system prune -a -f
+
+    sleep 1
+
     docker volume prune -f
+
+    sleep 1
+
     docker container prune -f
 
-    sleep 3 && clear
+    sleep 3
 
     # echo && echo -e "${GREEN}Pulling slave image from $COIN_NAME hub ...${NC}" && echo && sleep 2
 
@@ -149,6 +157,8 @@ function successs() {
     echo -e "${GREEN}Container best height:${NC}        $CONTAINER_HEIGHT" && echo
 
     echo -e "${GREEN}Masternode can be started from desktop wallet, done.${NC}" && echo
+    echo -e "${RED}If this node get online, you will never ever need to run this script again.${NC}" && echo
+    echo -e "${GREEN}Good luck.${NC}" && echo
 
 }
 

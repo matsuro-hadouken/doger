@@ -6,12 +6,35 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+COIN_NAME='dogecash'
+
+START_SRT='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/start.sh'
+
 function if_Root() {
 
     if [ "$(id -u)" != "0" ]; then
-        echo -e "${RED}This script must be run as root.${NC}" 1>&2
+        echo && echo -e "${RED}This script must be run as root.${NC}" 1>&2 && echo
         exit 1
     fi
+}
+
+function annotation() {
+
+    clear && echo
+
+    cat <<EOL
+
+DogeCash Docker Installer:
+
+Debian and Ubuntu x86_64 only supported, If you on different OS,
+then use DuckDuckGo.com, search for instruction on how to install
+docker for your distribution.
+
+EOL
+
+    echo
+    read -rp 'Ctrl-C to stop or any key to continue.'
+
 }
 
 function requirements() {
@@ -60,6 +83,23 @@ function requirements() {
 
 }
 
+function environment() {
+
+    mkdir -p $HOME/"$COIN_NAME"-utils
+    rm -f $HOME/"$COIN_NAME"-utils/*
+
+    cd $HOME/"$COIN_NAME"-utils || exit 1
+
+    echo && echo -e "${GREEN}Pulling utility scripts from GitHub ...${NC}" && echo
+
+    wget --no-check-certificate "$START_SRT" -q --show-progress --progress=bar:force 2>&1
+
+    chmod -R 700 $HOME/"$COIN_NAME"-utils/
+
+    echo
+
+}
+
 function if_Docker() {
 
     if [ -x "$(command -v docker)" ]; then
@@ -70,7 +110,7 @@ function if_Docker() {
 
         echo && echo 'Check for updates if neccessary.' && echo
 
-        exit 1
+        success
 
     fi
 
@@ -155,24 +195,27 @@ function distro() {
 
 }
 
+function success() {
+
+    echo && echo -e "go to utils directory ${GREEN}cd $HOME/"$COIN_NAME"-utils/${NC} and start installation by ${GREEN}./start.sh${NC}" && echo
+
+    exit 0
+}
+
 if_Root
 
+annotation
+
 requirements
+
+environment
 
 if_Docker
 
 clear
 
-cat <<EOL
-
-DogeCash Docker Installer:
-
-Debian and Ubuntu x86_64 only supported, If you on different OS,
-then use DuckDuckGo.com, search for instruction on how to install
-docker for your distribution.
-
-EOL
-
 sleep 3
 
 distro
+
+success
