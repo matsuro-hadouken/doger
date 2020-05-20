@@ -2,16 +2,20 @@
 
 # Docker installation, Debian and Ubuntu
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
 function check_condition() {
 
     if [ "$(id -u)" != "0" ]; then
-        echo "This script must be run as root." 1>&2
+        echo -e "${RED}This script must be run as root.${NC}" 1>&2
         exit 1
     fi
 
     if [ -x "$(command -v docker)" ]; then
 
-        echo 'Docker is already installed on your system.' && echo
+        echo -e "${GREEN}Docker is already installed on your system.${NC}" && echo
 
         docker -v || exit 1
 
@@ -24,27 +28,13 @@ function check_condition() {
     if ! uname -m | grep -q 'x86_64'; then
 
         {
-            echo 'ERROR: Designed for x86_64 architecture.'
+            echo -e "${RED}ERROR: Designed for x86_64 architecture.${NC}"
             exit 1
         }
 
     fi
 
 }
-
-clear
-
-cat <<EOL
-
-DogeCash Docker Installer:
-
-Debian and Ubuntu x86_64 only supported, If you on different OS,
-then use DuckDuckGo.com, search for instruction on how to install
-docker for your distribution.
-
-EOL
-
-sleep 3
 
 function debian_installation() {
 
@@ -66,7 +56,7 @@ function debian_installation() {
 
     docker -v || exit 1
 
-    echo && echo 'Docker successfully installed on your system.' && echo
+    echo && echo -e "${GREEN}Docker successfully installed on your system.${NC}" && echo
 
 }
 
@@ -90,23 +80,21 @@ function ubuntu_installation() {
 
     docker -v || exit 1
 
-    echo && echo 'Docker successfully installed on your system.' && echo
+    echo && echo -e "${GREEN}Docker successfully installed on your system.${NC}" && echo
 
 }
-
-check_condition
 
 function distro() {
 
     if (awk -F= '/^NAME/{print $2}' /etc/os-release | grep -q -o Debian); then
 
-        echo "debian_installation"
+        debian_installation
 
     fi
 
     if (awk -F= '/^NAME/{print $2}' /etc/os-release | grep -q -o Ubuntu); then
 
-        echo "ubuntu_installation"
+        ubuntu_installation
 
     else
 
@@ -117,3 +105,21 @@ function distro() {
     fi
 
 }
+
+check_condition
+
+clear
+
+cat <<EOL
+
+DogeCash Docker Installer:
+
+Debian and Ubuntu x86_64 only supported, If you on different OS,
+then use DuckDuckGo.com, search for instruction on how to install
+docker for your distribution.
+
+EOL
+
+sleep 3
+
+distro
