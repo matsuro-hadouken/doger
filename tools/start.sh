@@ -59,7 +59,17 @@ function annotation() {
 function inputs() {
 
     read -p 'Masternode private key: ' PRIVAT_KEY
-    echo
+
+    echo && echo "Trying to get external IP from couple of services:" && echo
+
+    ifconfig_me=$(curl ifconfig.me | tr -d '%')
+    ident_me=$(curl ident.me | tr -d '%')
+
+    echo -e "${GREEN}ifconfig.me report: ${NC} $ifconfig_me"
+    echo -e "${GREEN}ident.me report: ${NC} $ident_me" && echo
+
+    echo -e "${RED}Please use IPv4 from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
+
     read -p 'VPS esternal IP: ' EXTERNAL_IP
 
     echo
@@ -75,7 +85,7 @@ function inputs() {
 
 function install_MASTER() {
 
-    echo -e "${RED}Stopping active containers and removing all docker data ...${NC}" && echo && sleep 2
+    echo && echo -e "${RED}Stopping active containers and removing all docker data ...${NC}" && echo && sleep 2
 
     docker container stop "$(docker container list -qa)"
 
@@ -153,7 +163,7 @@ function wait_for_sync() {
 function successs() {
 
     echo && echo -e "${GREEN}Container syncronized with network.${NC}" && echo
-    echo -e "${GREEN}Netwrok last finalized block:${NC} $LFB"
+    echo -e "${GREEN}Network last finalized block:${NC} $LFB"
     echo -e "${GREEN}Container best height:${NC}        $CONTAINER_HEIGHT" && echo
 
     echo -e "${GREEN}Masternode can be started from desktop wallet, done.${NC}" && echo
