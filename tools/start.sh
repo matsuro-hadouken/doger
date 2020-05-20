@@ -62,8 +62,8 @@ function inputs() {
 
     echo && echo "Trying to get external IP from couple of services:" && echo
 
-    ifconfig_me=$(curl ifconfig.me | tr -d '%')
-    ident_me=$(curl ident.me | tr -d '%')
+    ifconfig_me=$(curl -s ifconfig.me | tr -d '%')
+    ident_me=$(curl -s ident.me | tr -d '%')
 
     echo -e "${GREEN}ifconfig.me report: ${NC} $ifconfig_me"
     echo -e "${GREEN}ident.me report: ${NC} $ident_me" && echo
