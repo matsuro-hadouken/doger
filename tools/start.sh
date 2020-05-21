@@ -170,7 +170,7 @@ function WaitForSync() {
 
     echo && echo -e "${GREEN}Waiting for $COIN_NAME explorer ...${NC}" && echo
 
-    LFB=$(curl -s --max-time 15 --connect-timeout 30 $EXPLORER_API | jq '.blockbook | .bestHeight')
+    LFB=$(curl -s --max-time 20 --connect-timeout 40 $EXPLORER_API | jq '.blockbook | .bestHeight')
 
     if ! [[ $LFB =~ $numba ]]; then
 
@@ -185,7 +185,7 @@ function WaitForSync() {
     sleep 1
 
     echo -e "Current $COIN_NAME network last finalized block: $LFB" && echo
-    echo && echo "${RED}Next step take unknown amount of time, patience required for decentralized magic.${NC}"
+    echo && echo -e "${RED}Next step take unknown amount of time, patience required for decentralized magic.${NC}" && echo
 
     echo "Waiting for container to follow, please wait ..." && echo
 
@@ -216,7 +216,7 @@ function InstallationSuccesss() {
     echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740${NC} ${RED}$PRIVAT_KEY${NC} collateral_txid collateral_index" && echo
 
     echo "To get collateral_txid and collateral_index go to desktop wallet,"
-    echo -e "paste this to console ${RED}getmasternodeoutput${NC} and press enter." && echo
+    echo -e "paste this to console ${RED}getmasternodeoutputs${NC} and press enter." && echo
 
     echo -e "${GREEN}About now, masternode can be started from your desktop computer.${NC}" && echo
 
@@ -241,6 +241,8 @@ function MasternodeStatus() {
     while true; do
 
         echo && read -rp "Check again ? Ctrl-C to exit or any key to continue."
+
+        clear
 
         echo && echo -e "${GREEN}#####################################################${NC}" && echo
 
