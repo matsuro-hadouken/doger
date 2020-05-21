@@ -17,6 +17,9 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
+re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
+
 COIN_NAME='dogecash'
 MASTER_CONTAINER_NAME='MASTER'
 
@@ -58,23 +61,53 @@ function annotation() {
 
 function inputs() {
 
-    read -p 'Masternode private key: ' PRIVAT_KEY
+    while true; do
+
+        read -p 'Masternode private key: ' PRIVAT_KEY
+
+        short=${PRIVAT_KEY:0:2}
+
+        if [[ $short =~ 56 ]] || [[ $short =~ 57 ]]; then
+
+            break
+
+        else
+
+            echo && echo -e "${RED}Invalid private key format, try again.${NC}" && echo
+
+        fi
+
+    done
 
     echo && echo "Trying to get external IP from couple of services:" && echo
 
-    ifconfig_me=$(curl -s ifconfig.me | tr -d '%')
-    ident_me=$(curl -s ident.me | tr -d '%')
+    amazon_aws=$(curl -s --max-time 10 --connect-timeout 15 https://checkip.amazonaws.com) || amazon_aws='dead pipe'
+    ifconfig_me=$(curl -s --max-time 10 --connect-timeout 15 https://ifconfig.me) || ifconfig_me='dead pipe'
+    ident_me=$(curl -s --max-time 10 --connect-timeout 15 https://ident.me) || ident_me='dead pipe'
 
-    echo -e "${GREEN}ifconfig.me report: ${NC} $ifconfig_me"
-    echo -e "${GREEN}ident.me report:    ${NC} $ident_me" && echo
+    echo -e "${GREEN}amazonaws.com report: ${NC} $amazon_aws"
+    echo -e "${GREEN}ifconfig.me report:   ${NC} $ifconfig_me"
+    echo -e "${GREEN}ident.me report:      ${NC} $ident_me" && echo
 
-    echo -e "${RED}Please use IPv4 from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
+    echo -e "${GREEN}Please use IPv4 from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
 
-    read -p 'VPS esternal IP: ' EXTERNAL_IP
+    while true; do
 
-    echo
+        read -p 'VPS external IP: ' EXTERNAL_IP
 
-    echo -e "${RED}Private key:${NC} $PRIVAT_KEY"
+        if [[ $EXTERNAL_IP =~ $re ]]; then
+
+            break
+
+        else
+
+            echo && echo -e "${RED}Invalid IPv4 address format, try again.${NC}" && echo
+
+        fi
+
+    done
+
+    echo && echo -e "${RED}Private key:${NC} $PRIVAT_KEY"
     echo -e "${RED}External IP address:${NC} $EXTERNAL_IP"
 
     echo
