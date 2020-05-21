@@ -10,6 +10,10 @@
 
 # PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
 if [[ $EUID -ne 0 ]]; then
 
     echo && echo -e "${RED}WARNING: $0 must be run as root.${NC}" && echo
@@ -17,11 +21,10 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
-re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
-
 COIN_NAME='dogecash'
 MASTER_CONTAINER_NAME='MASTER'
+EXPLORER_WEB='https://explorer.dogec.io/'
+EXPLORER_API='https://explorer.dogec.io/api/v2'
 
 LFB="unknown"
 CONTAINER_HEIGHT="0"
@@ -29,24 +32,22 @@ CONTAINER_HEIGHT="0"
 MASTER_CONTAINER_HUB='dogecash/no-prompt-main-master_x64'
 SLAVE_CONTAINER_HUB='dogecash/no-prompt-main-slave_x64'
 
+re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
+re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
 numba='^[0-9]+$'
 
-EXPLORER_URL='https://explorer.dogec.io/api/v2'
+function Annotation() {
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m'
+    clear
 
-function annotation() {
-
-    clear && echo
+    echo
 
     echo && echo -e "${RED}PLEASE READ:${NC}" && echo
 
     echo "We about to start $MASTER_CONTAINER_NAME node container for $COIN_NAME" && echo
 
     echo "Script build for begginers and required naked VPS server with only docker installed,"
-    echo "please use docker-install.sh first from $COIN_NAME docker repository." && echo
+    echo "please use docker-install.sh first from $COIN_NAME doger repository." && echo
 
     echo -e "${RED}All images and containers will be wiped from this VPS, if you already have docker${NC}"
     echo -e "${RED}containers or images on your system it will be no way to recover them.${NC}" && echo
@@ -55,11 +56,16 @@ function annotation() {
 
     read -rp "Continue ? Ctrl-C to stop or any key to continue."
 
+    clear
+
     echo
 
 }
 
-function inputs() {
+function Inputs() {
+
+    echo && echo -e "${GREEN}Now we need to generate masternode private key.${NC}" && echo
+    echo -e "Open desktop wallet, paste this command in to console ${RED}createmasternodekey${NC} and press enter." && echo
 
     while true; do
 
@@ -79,7 +85,7 @@ function inputs() {
 
     done
 
-    echo && echo "Trying to get external IP from couple of services:" && echo
+    echo && echo -e "Trying to get external IP from couple of services ..." && echo
 
     amazon_aws=$(curl -s --max-time 10 --connect-timeout 15 https://checkip.amazonaws.com) || amazon_aws='dead pipe'
     ifconfig_me=$(curl -s --max-time 10 --connect-timeout 15 https://ifconfig.me) || ifconfig_me='dead pipe'
@@ -89,7 +95,7 @@ function inputs() {
     echo -e "${GREEN}ifconfig.me report:   ${NC} $ifconfig_me"
     echo -e "${GREEN}ident.me report:      ${NC} $ident_me" && echo
 
-    echo -e "${GREEN}Please use IPv4 from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
+    echo -e "${GREEN}Please use${NC} ${RED}IPv4${NC} ${GREEN}from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
 
     while true; do
 
@@ -116,13 +122,13 @@ function inputs() {
 
 }
 
-function install_MASTER() {
+function InstallMaster() {
 
     echo && echo -e "${RED}Stopping active containers and removing all docker data ...${NC}" && echo && sleep 2
 
     docker container stop "$(docker container list -qa)"
 
-    sleep 3
+    echo && sleep 3
 
     docker system prune -a -f
 
@@ -134,7 +140,7 @@ function install_MASTER() {
 
     docker container prune -f
 
-    sleep 3
+    sleep 2
 
     # echo && echo -e "${GREEN}Pulling slave image from $COIN_NAME hub ...${NC}" && echo && sleep 2
 
@@ -160,24 +166,30 @@ function install_MASTER() {
 
 }
 
-function wait_for_sync() {
+function WaitForSync() {
 
-    while ! [[ $LFB =~ $numba ]]; do
+    echo && echo -e "${GREEN}Waiting for $COIN_NAME explorer ...${NC}" && echo
 
-        LFB=$(curl -s $EXPLORER_URL | jq '.blockbook | .bestHeight')
+    LFB=$(curl -s --max-time 15 --connect-timeout 30 $EXPLORER_API | jq '.blockbook | .bestHeight')
 
-        echo && echo "Waiting for $COIN_NAME explorer replay."
+    if ! [[ $LFB =~ $numba ]]; then
 
-        sleep 1
+        echo && echo -e "${RED}FATAL ERROR:${NC} Please check if explorer online, if not report to developers." && echo
 
-    done
+        echo $EXPLORER_WEB && echo
 
-    echo -e "Netwrok last finalized block: $LFB"
-    echo "Waiting for container to follow." && echo
+        exit 1
+
+    fi
+
+    sleep 1
+
+    echo -e "Current $COIN_NAME network last finalized block: $LFB" && echo
+    echo && echo "${RED}Next step take unknown amount of time, patience required for decentralized magic.${NC}"
+
+    echo "Waiting for container to follow, please wait ..." && echo
 
     while true; do
-
-        LFB=$(curl -s $EXPLORER_URL | jq '.blockbook | .bestHeight')
 
         CONTAINER_HEIGHT=$(docker exec -u "$COIN_NAME" -it "$MASTER_CONTAINER_NAME" "$COIN_NAME"-cli getblockcount)
 
@@ -187,33 +199,67 @@ function wait_for_sync() {
 
         fi
 
-        sleep 3
+        sleep 5
 
     done
 
 }
 
-function successs() {
+function InstallationSuccesss() {
 
     echo && echo -e "${GREEN}Container syncronized with network.${NC}" && echo
     echo -e "${GREEN}Network last finalized block:${NC} $LFB"
     echo -e "${GREEN}Container best height:${NC}        $CONTAINER_HEIGHT" && echo
 
-    echo -e "${GREEN}Masternode can be started from desktop wallet, done.${NC}" && echo
+    echo "Add thins line in to your DESKTOP masternode.conf:" && echo
 
-    echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740 $PRIVAT_KEY collateral_txid collateral_index${NC}"
+    echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740${NC} ${RED}$PRIVAT_KEY${NC} collateral_txid collateral_index" && echo
 
-    echo -e "${RED}If this node get online, you will never ever need to run this script again.${NC}" && echo
+    echo "To get collateral_txid and collateral_index go to desktop wallet,"
+    echo -e "paste this to console ${RED}getmasternodeoutput${NC} and press enter." && echo
+
+    echo -e "${GREEN}About now, masternode can be started from your desktop computer.${NC}" && echo
+
+    echo -e "${RED}If everything works in the end, you will never ever need to run this script again.${NC}" && echo
+
     echo -e "${GREEN}Good luck.${NC}" && echo
 
 }
 
-annotation
+function MasternodeStatus() {
 
-inputs
+    echo && read -rp "Did you start masternode from your desktop wallet ? Ctrl-C to exit or any key to check status."
 
-install_MASTER
+    clear
 
-wait_for_sync
+    echo && echo -e "${GREEN}#####################################################${NC}" && echo
 
-successs
+    docker exec -it MASTER dogecash-cli getmasternodestatus
+
+    echo && echo -e "${GREEN}#####################################################${NC}" && echo
+
+    while true; do
+
+        echo && read -rp "Check again ? Ctrl-C to exit or any key to continue."
+
+        echo && echo -e "${GREEN}#####################################################${NC}" && echo
+
+        docker exec -it MASTER dogecash-cli getmasternodestatus
+
+        echo && echo -e "${GREEN}#####################################################${NC}" && echo
+
+    done
+
+}
+
+Annotation
+
+Inputs
+
+InstallMaster
+
+WaitForSync
+
+InstallationSuccesss
+
+MasternodeStatus
