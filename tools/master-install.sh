@@ -26,6 +26,8 @@ MASTER_CONTAINER_NAME='MASTER'
 EXPLORER_WEB='https://explorer.dogec.io/'
 EXPLORER_API='https://explorer.dogec.io/api/v2'
 
+confirmations_need=4
+
 LFB="unknown"
 CONTAINER_HEIGHT="0"
 
@@ -40,18 +42,12 @@ function Annotation() {
 
     clear
 
-    echo
-
     echo && echo -e "${RED}PLEASE READ:${NC}" && echo
-
     echo "We about to start $MASTER_CONTAINER_NAME node container for $COIN_NAME" && echo
-
     echo "Script build for begginers and required naked VPS server with only docker installed,"
     echo "please use docker-install.sh first from $COIN_NAME doger repository." && echo
-
     echo -e "${RED}All images and containers will be wiped from this VPS, if you already have docker${NC}"
     echo -e "${RED}containers or images on your system it will be no way to recover them.${NC}" && echo
-
     echo -e "${GREEN}Advanced users please setup everything manualy according appropriate instruction.${NC}" && echo
 
     read -rp "Continue ? Ctrl-C to stop or any key to continue."
@@ -62,6 +58,113 @@ function Annotation() {
 
 }
 
+function collateralIndex() {
+
+    clear
+
+    echo && echo -e "${GREEN}Welcome to DogeCash dungeon, lets get started!${NC}" && echo
+    echo -e "To become guardian of DogeCash universe every node owner shall attain strong desire." && echo
+    echo -e "Open desktop wallet, go to ${GREEN}RECEIVE${NC} tab and create new address." && echo
+    echo -e "From the same  wallet send ${GREEN}exactly 5000 DogeCash${NC} to the address which just been created." && echo
+    echo -e "Now go to ${GREEN}HOME${NC} tab, you should see new transaction to your self in a history list." && echo
+    echo -e "Open the transaction details and look for ${GREEN}tx ID${NC}, see ?" && echo
+
+    while true; do
+
+        read -rp 'Yes here is my ID: ' collateral_txid
+
+        if [[ "$collateral_txid" =~ ^[0-9]+$ ]] || [[ "$collateral_txid" =~ ^[a-zA-Z]+$ ]] || [[ "$collateral_txid" =~ ['!@#$%^&*()_+ '] ]]; then
+
+            echo && echo -e "${RED}ERROR: Invalid TX ID, please try again.${NC}" && echo
+
+        else
+
+            break
+
+        fi
+
+    done
+
+    collateral_index=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/"$collateral_txid" | jq '.vout' | grep 'value' | head -1 | tr -d '"value": ,')
+
+    if ! [[ $collateral_index =~ $numba ]]; then
+
+        echo && echo -e "${RED}ERROR: Please check if explorer online, if not, then report to developers.${NC}" && echo
+
+        echo $EXPLORER_WEB && echo
+
+        sleep 5
+
+        setterm -cursor on
+
+        return
+
+    fi
+
+    if ! [[ $collateral_index =~ '500000000000' ]]; then
+
+        collateral_index='1'
+
+    else
+
+        collateral_index='0'
+
+    fi
+
+    # confirmations check
+
+    setterm -cursor off
+
+    confirmations=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/$collateral_txid | jq '.' | grep '"confirmations":' | tr -d '"confirmations":  ,')
+
+    if ! [[ $confirmations =~ $numba ]]; then
+
+        echo && echo -e "${RED}ERROR: Please check if explorer online, if not, then report to developers.${NC}" && echo
+
+        echo $EXPLORER_WEB && echo
+
+        sleep 5
+
+        setterm -cursor on
+
+        return
+
+    fi
+
+    if ! [[ $confirmations -gt $confirmations_need ]]; then
+
+        echo && echo -e "${GREEN}Waiting for at least 4 confirmations ...${NC}" && echo
+
+        until [[ $confirmations -gt $confirmations_need ]]; do
+
+            confirmations=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/$collateral_txid | jq '.' | grep '"confirmations":' | tr -d '"confirmations":  ,')
+
+            echo -ne "Confirmed: $confirmations time.\r"
+
+            sleep 10
+
+        done
+
+        echo "Such fast block chain!" && echo
+
+    else
+
+        echo -e "${GREEN}Transaction confirmed $confirmations times, which is more then enough.${NC}" && echo
+
+    fi
+
+    setterm -cursor on
+
+    echo && echo -e "Collateral transaction ID: ${RED}$collateral_txid${NC}" && echo
+    echo -e "Collateral Index: ${RED}$collateral_index${NC}" && echo
+    echo -e "Confirmed: ${RED}$confirmations${NC}" && echo
+
+    echo -e "${RED}Initial TX function, work in progress${NC}${GREEN}^^${NC}" && echo
+
+    sleep 2
+
+}
+
 function Inputs() {
 
     echo && echo -e "${GREEN}Now we need to generate masternode private key.${NC}" && echo
@@ -69,7 +172,7 @@ function Inputs() {
 
     while true; do
 
-        read -p 'Masternode private key: ' PRIVAT_KEY
+        read -rp 'Masternode private key: ' PRIVAT_KEY
 
         short=${PRIVAT_KEY:0:2}
 
@@ -99,7 +202,7 @@ function Inputs() {
 
     while true; do
 
-        read -p 'VPS external IP: ' EXTERNAL_IP
+        read -rp 'VPS external IP: ' EXTERNAL_IP
 
         if [[ $EXTERNAL_IP =~ $re ]]; then
 
@@ -213,7 +316,7 @@ function InstallationSuccesss() {
 
     echo "Add thins line in to your DESKTOP masternode.conf:" && echo
 
-    echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740${NC} ${RED}$PRIVAT_KEY${NC} collateral_txid collateral_index" && echo
+    echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740${NC} ${RED}$PRIVAT_KEY${NC} $collateral_txid $collateral_index" && echo
 
     echo "To get collateral_txid and collateral_index go to desktop wallet,"
     echo -e "paste this to console ${RED}getmasternodeoutputs${NC} and press enter." && echo
@@ -255,6 +358,8 @@ function MasternodeStatus() {
 }
 
 Annotation
+
+collateralIndex
 
 Inputs
 

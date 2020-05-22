@@ -15,8 +15,8 @@ function checkArguments() {
 
         echo && echo -e "${RED}ERROR: Not enough arguments.${NC}" && echo
         echo -e "${GREEN}check_masternode_status.sh [NODE_NAME]${NC}" && echo
-        echo "Example: check_masternode_status.sh MASTER"
-        echo "Example: check_masternode_status.sh SLAVE_3" && echo
+        echo 'Example: ./check_masternode_status.sh MASTER'
+        echo 'Example: ./check_masternode_status.sh SLAVE_3' && echo
 
         exit 1
 
@@ -30,13 +30,13 @@ function MasternodeStatus() {
 
         clear
 
-        echo && echo -e "${GREEN}#####################################################${NC}" && echo
+        echo
 
         docker exec -it "$NODE_NAME" dogecash-cli getmasternodestatus
 
-        echo && echo -e "${GREEN}#####################################################${NC}" && echo
-
         echo && read -rp "Check again ? Ctrl-C to exit or any key to continue."
+
+        echo
 
     done
 
