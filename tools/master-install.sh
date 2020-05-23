@@ -27,7 +27,7 @@ MASTER_CONTAINER_NAME='MASTER'
 EXPLORER_WEB='https://explorer.dogec.io/'
 EXPLORER_API='https://explorer.dogec.io/api/v2'
 
-confirmations_need=4
+confirmations_need=3
 rotten_tomato=99 # to old transaction, possible collateral lost ( staking, human factor ... )
 
 LFB="unknown"
