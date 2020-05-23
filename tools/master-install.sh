@@ -335,9 +335,6 @@ function InstallationSuccesss() {
 
     echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740${NC} ${RED}$PRIVAT_KEY${NC} $collateral_txid $collateral_index" && echo
 
-    echo "To get collateral_txid and collateral_index go to desktop wallet,"
-    echo -e "paste this to console ${RED}getmasternodeoutputs${NC} and press enter." && echo
-
     echo -e "${GREEN}About now, masternode can be started from your desktop computer.${NC}" && echo
 
     echo -e "${RED}If everything works in the end, you will never ever need to run this script again.${NC}" && echo
