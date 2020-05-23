@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# check last finalized block on explorer and compare to daemon
+# check last finalized block on explorer and compare to $1 daemon
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -13,6 +13,21 @@ EXPLORER_API='https://explorer.dogec.io/api/v2'
 
 NODE_NAME=$1
 numba='^[0-9]+$'
+
+function checkArguments() {
+
+    if [ -z "$NODE_NAME" ]; then
+
+        echo && echo -e "${RED}ERROR: Not enough arguments.${NC}" && echo
+        echo -e "${GREEN}explorer.sh [NODE_NAME]${NC}" && echo
+        echo 'Example: ./explorer.sh MASTER'
+        echo 'Example: ./explorer.sh SLAVE_3' && echo
+
+        exit 1
+
+    fi
+
+}
 
 function SyncCheck() {
 
@@ -32,23 +47,24 @@ function SyncCheck() {
 
     sleep 1
 
-    echo -e "Current $COIN_NAME network last finalized block: $LFB" && echo
-    echo && echo -e "${RED}Next step take unknown amount of time, patience required for decentralized magic.${NC}" && echo
+    while [ "x$keypress" = "x" ]; do
 
-    echo "Waiting for container to follow, please wait ..." && echo
+        LFB=$(curl -s --max-time 20 --connect-timeout 40 $EXPLORER_API | jq '.blockbook | .bestHeight')
+        CONTAINER_HEIGHT=$(docker exec -u "$COIN_NAME" -it $NODE_NAME "$COIN_NAME"-cli getblockcount)
 
-    while true; do
+        echo -e "Explorer block:  $LFB"
+        echo -e "Container block: $CONTAINER_HEIGHT"
 
-        CONTAINER_HEIGHT=$(docker exec -u "$COIN_NAME" -it "$MASTER_CONTAINER_NAME" "$COIN_NAME"-cli getblockcount)
-
-        if [[ $CONTAINER_HEIGHT =~ $LFB ]]; then
-
-            break
-
-        fi
+        echo && echo "Ctrl-C to exit." && echo -e "\e[5A"
 
         sleep 5
 
     done
 
+    echo
+
 }
+
+checkArguments
+
+SyncCheck

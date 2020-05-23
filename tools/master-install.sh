@@ -12,6 +12,7 @@
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 if [[ $EUID -ne 0 ]]; then
@@ -27,12 +28,12 @@ EXPLORER_WEB='https://explorer.dogec.io/'
 EXPLORER_API='https://explorer.dogec.io/api/v2'
 
 confirmations_need=4
+rotten_tomato=99 # to old transaction, possible collateral lost ( staking, human factor ... )
 
 LFB="unknown"
 CONTAINER_HEIGHT="0"
 
 MASTER_CONTAINER_HUB='dogecash/no-prompt-main-master_x64'
-SLAVE_CONTAINER_HUB='dogecash/no-prompt-main-slave_x64'
 
 re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
 re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
@@ -89,15 +90,18 @@ function collateralIndex() {
 
     if ! [[ $collateral_index =~ $numba ]]; then
 
-        echo && echo -e "${RED}ERROR: Please check if explorer online, if not, then report to developers.${NC}" && echo
+        clear
+
+        echo && echo -e "${RED}ERROR: Please, double check ID you provide.${NC}" && echo
+        echo "Search in explorer for your transaction, if explorer offline report to developers." && echo
 
         echo $EXPLORER_WEB && echo
 
-        sleep 5
+        sleep 1
 
         setterm -cursor on
 
-        return
+        exit 1
 
     fi
 
@@ -115,7 +119,7 @@ function collateralIndex() {
 
     setterm -cursor off
 
-    confirmations=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/$collateral_txid | jq '.' | grep '"confirmations":' | tr -d '"confirmations":  ,')
+    confirmations=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/"$collateral_txid" | jq '.' | grep '"confirmations":' | tr -d 'confirmats":  ,')
 
     if ! [[ $confirmations =~ $numba ]]; then
 
@@ -123,23 +127,23 @@ function collateralIndex() {
 
         echo $EXPLORER_WEB && echo
 
-        sleep 5
+        sleep 1
 
         setterm -cursor on
 
-        return
+        exit 1
 
     fi
 
     if ! [[ $confirmations -gt $confirmations_need ]]; then
 
-        echo && echo -e "${GREEN}Waiting for at least 4 confirmations ...${NC}" && echo
+        echo && echo -e "${GREEN}Waiting for at least $confirmations_need confirmations ...${NC}" && echo
 
         until [[ $confirmations -gt $confirmations_need ]]; do
 
-            confirmations=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/$collateral_txid | jq '.' | grep '"confirmations":' | tr -d '"confirmations":  ,')
+            confirmations=$(curl -s --max-time 15 --connect-timeout 20 https://explorer.dogec.io/api/v2/tx/"$collateral_txid" | jq '.' | grep '"confirmations":' | tr -d 'confirmats":  ,')
 
-            echo -ne "Confirmed: $confirmations time.\r"
+            echo -ne "Confirmed: $confirmations time.\\r"
 
             sleep 10
 
@@ -149,7 +153,14 @@ function collateralIndex() {
 
     else
 
-        echo -e "${GREEN}Transaction confirmed $confirmations times, which is more then enough.${NC}" && echo
+        if [[ $confirmations -ge $rotten_tomato ]]; then
+
+            echo && echo -e "${CYAN}WARNING: $confirmations confirmtions, transaction is to old, we suggest to make a new one.${NC}"
+
+        else
+
+            echo && echo -e "${GREEN}Transaction confirmed $confirmations times, which is more then enough.${NC}"
+        fi
 
     fi
 
@@ -157,9 +168,7 @@ function collateralIndex() {
 
     echo && echo -e "Collateral transaction ID: ${RED}$collateral_txid${NC}" && echo
     echo -e "Collateral Index: ${RED}$collateral_index${NC}" && echo
-    echo -e "Confirmed: ${RED}$confirmations${NC}" && echo
-
-    echo -e "${RED}Initial TX function, work in progress${NC}${GREEN}^^${NC}" && echo
+    echo -e "Confirmed: ${RED}$confirmations${NC}"
 
     sleep 2
 
@@ -285,10 +294,7 @@ function WaitForSync() {
 
     fi
 
-    sleep 1
-
-    echo -e "Current $COIN_NAME network last finalized block: $LFB" && echo
-    echo && echo -e "${RED}Next step take unknown amount of time, patience required for decentralized magic.${NC}" && echo
+    echo -e "${RED}Next step take unknown amount of time, patience required for decentralized magic.${NC}" && echo
 
     echo "Waiting for container to follow, please wait ..." && echo
 
@@ -296,15 +302,26 @@ function WaitForSync() {
 
         CONTAINER_HEIGHT=$(docker exec -u "$COIN_NAME" -it "$MASTER_CONTAINER_NAME" "$COIN_NAME"-cli getblockcount)
 
-        if [[ $CONTAINER_HEIGHT =~ $LFB ]]; then
+        LFB=$(curl -s --max-time 20 --connect-timeout 40 $EXPLORER_API | jq '.blockbook | .bestHeight')
+
+        CH=${CONTAINER_HEIGHT//[ $'\001'-$'\037']/}
+
+        echo -e "${GREE}Explorer  block:${NC} $LFB"
+        echo -e "${GREE}Container block:${NC} $CONTAINER_HEIGHT"
+
+        if [[ "$CH" -ge "$LFB" ]]; then
 
             break
 
         fi
 
+        echo -e "\e[3A"
+
         sleep 5
 
     done
+
+    echo
 
 }
 
@@ -314,7 +331,7 @@ function InstallationSuccesss() {
     echo -e "${GREEN}Network last finalized block:${NC} $LFB"
     echo -e "${GREEN}Container best height:${NC}        $CONTAINER_HEIGHT" && echo
 
-    echo "Add thins line in to your DESKTOP masternode.conf:" && echo
+    echo "Add this line in to your DESKTOP masternode.conf:" && echo
 
     echo -e "${GREEN}$MASTER_CONTAINER_NAME $EXTERNAL_IP:56740${NC} ${RED}$PRIVAT_KEY${NC} $collateral_txid $collateral_index" && echo
 

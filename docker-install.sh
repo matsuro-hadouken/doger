@@ -8,7 +8,11 @@ NC='\033[0m'
 
 COIN_NAME='dogecash'
 
-START_SRT='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/start.sh'
+BLOCKCHAIN_SH='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/blockchain.sh'
+EXPLORER_SH='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/explorer.sh'
+INFO_SH='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/info.sh'
+MASTER_SH='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/master-install.sh'
+STATUS_SH='https://raw.githubusercontent.com/matsuro-hadouken/doger/master/tools/status.sh'
 
 function if_Root() {
 
@@ -92,7 +96,11 @@ function environment() {
 
     echo && echo -e "${GREEN}Pulling utility scripts from GitHub ...${NC}" && echo
 
-    wget --no-check-certificate "$START_SRT" -q --show-progress --progress=bar:force 2>&1
+    wget --no-check-certificate "$BLOCKCHAIN_SH" -q --show-progress --progress=bar:force 2>&1
+    wget --no-check-certificate "$EXPLORER_SH" -q --show-progress --progress=bar:force 2>&1
+    wget --no-check-certificate "$INFO_SH" -q --show-progress --progress=bar:force 2>&1
+    wget --no-check-certificate "$MASTER_SH" -q --show-progress --progress=bar:force 2>&1
+    wget --no-check-certificate "$STATUS_SH" -q --show-progress --progress=bar:force 2>&1
 
     chmod -R 700 $HOME/"$COIN_NAME"-utils/
 
@@ -201,7 +209,7 @@ function distro() {
 
 function success() {
 
-    echo && echo -e "go to utils directory ${GREEN}cd $HOME/"$COIN_NAME"-utils/${NC} and start installation by ${GREEN}./start.sh${NC}" && echo
+    echo && echo -e "go to utils directory ${GREEN}cd $HOME/"$COIN_NAME"-utils/${NC} and start installation by ${GREEN}./master-install.sh${NC}" && echo
 
     exit 0
 }
