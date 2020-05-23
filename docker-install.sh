@@ -209,7 +209,7 @@ function distro() {
 
 function success() {
 
-    echo && echo -e "go to utils directory ${GREEN}cd $HOME/"$COIN_NAME"-utils/${NC} and start installation by ${GREEN}./master-install.sh${NC}" && echo
+    echo && echo -e "Copy paste this in to console: ${GREEN}cd $HOME/"$COIN_NAME"-utils && ./master-install.sh${NC} and press enter." && echo
 
     exit 0
 }
