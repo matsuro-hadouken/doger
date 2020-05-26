@@ -61,10 +61,11 @@ function Annotation() {
     echo && echo -e "${RED}PLEASE READ:${NC}" && echo
 
     echo -e "${RED}This script is designed for a clean install on Ubuntu 18 or Debian${NC}."
-    echo -e "${RED}It will destroy any other docker data of yours.${NC}"
+    echo -e "${RED}It will destroy any other docker data of yours.${NC}" && echo
 
-    echo "We about to start $MASTER_CONTAINER_NAME node container for $COIN_NAME" && echo
     echo -e "${GREEN}Advanced users please setup everything manualy according appropriate instruction.${NC}" && echo
+
+    echo "Installing $COIN_NAME masternode ..." && echo
 
     read -rp "Continue ? Ctrl-C to stop or any key to continue."
 
