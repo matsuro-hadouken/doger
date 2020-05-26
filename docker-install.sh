@@ -209,7 +209,8 @@ function distro() {
 
 function success() {
 
-    echo && echo -e "Copy paste this in to console: ${GREEN}cd $HOME/"$COIN_NAME"-utils && ./master-install.sh${NC} and press enter." && echo
+    echo && echo -e "Copy paste this in to console:" && echo
+    echo -e "${GREEN}cd $HOME/"$COIN_NAME"-utils && ./master-install.sh${NC} and press enter." && echo
 
     exit 0
 }
