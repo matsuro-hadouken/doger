@@ -39,7 +39,7 @@ re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
 re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
 numba='^[0-9]+$'
 
-function if_Docker() {
+function ifDocker() {
 
     if ! [ -x "$(command -v docker)" ]; then
 
@@ -386,6 +386,8 @@ function MasternodeStatus() {
     done
 
 }
+
+ifDocker
 
 Annotation
 
