@@ -39,14 +39,32 @@ re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
 re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
 numba='^[0-9]+$'
 
+function if_Docker() {
+
+    if ! [ -x "$(command -v docker)" ]; then
+
+        echo -e "${RED}ERROR: Need to install docker first.${NC}" && echo
+
+        echo "Run this command:"
+
+        echo 'wget -O - https://raw.githubusercontent.com/matsuro-hadouken/doger/master/docker-install.sh | bash'
+
+        exit 1
+
+    fi
+}
+
 function Annotation() {
 
     clear
 
     echo && echo -e "${RED}PLEASE READ:${NC}" && echo
+
+    echo -e "${RED}This script is designed for a clean install on Ubuntu 18 or Debian${NC}."
+    echo -e "${RED}It will destroy any other docker data of yours.${NC}"
+
     echo "We about to start $MASTER_CONTAINER_NAME node container for $COIN_NAME" && echo
-    echo "Script build for begginers and required naked VPS server with only docker installed,"
-    echo "please use docker-install.sh first from $COIN_NAME doger repository." && echo
+    echo "Please use docker-install.sh first from $COIN_NAME doger repository." && echo
     echo -e "${RED}All images and containers will be wiped from this VPS, if you already have docker${NC}"
     echo -e "${RED}containers or images on your system it will be no way to recover them.${NC}" && echo
     echo -e "${GREEN}Advanced users please setup everything manualy according appropriate instruction.${NC}" && echo
