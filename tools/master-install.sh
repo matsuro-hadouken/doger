@@ -64,7 +64,6 @@ function Annotation() {
     echo -e "${RED}It will destroy any other docker data of yours.${NC}"
 
     echo "We about to start $MASTER_CONTAINER_NAME node container for $COIN_NAME" && echo
-    echo "Please use docker-install.sh first from $COIN_NAME doger repository." && echo
     echo -e "${RED}All images and containers will be wiped from this VPS, if you already have docker${NC}"
     echo -e "${RED}containers or images on your system it will be no way to recover them.${NC}" && echo
     echo -e "${GREEN}Advanced users please setup everything manualy according appropriate instruction.${NC}" && echo
