@@ -39,6 +39,8 @@ re='^(0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))\.){3}'
 re+='0*(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))$'
 numba='^[0-9]+$'
 
+IPv4_STRING='(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
+
 function ifDocker() {
 
     if ! [ -x "$(command -v docker)" ]; then
@@ -190,7 +192,7 @@ function collateralIndex() {
 
 }
 
-function Inputs() {
+function ReadMasternodePrivateKey() {
 
     echo && echo -e "${GREEN}Now we need to generate masternode private key.${NC}" && echo
     echo -e "Open desktop wallet, paste this command in to console ${RED}createmasternodekey${NC} and press enter." && echo
@@ -213,6 +215,10 @@ function Inputs() {
 
     done
 
+}
+
+function ReadExternalIP() {
+
     echo && echo -e "Trying to get external IP from couple of services ..." && echo
 
     amazon_aws=$(curl -s --max-time 10 --connect-timeout 15 https://checkip.amazonaws.com) || amazon_aws='dead pipe'
@@ -223,23 +229,48 @@ function Inputs() {
     echo -e "${GREEN}ifconfig.me report:   ${NC} $ifconfig_me"
     echo -e "${GREEN}ident.me report:      ${NC} $ident_me" && echo
 
-    echo -e "${GREEN}Please use${NC} ${RED}IPv4${NC} ${GREEN}from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
+    echo -e "${GREEN}Using${NC} ${RED}IPv4${NC} ${GREEN}from the output above${NC} ${RED}^^${NC}" && echo && sleep 1
 
-    while true; do
+    array=($amazon_aws $ifconfig_me $ident_me)
 
-        read -rp 'VPS external IP: ' EXTERNAL_IP
+    remove=(dead pipe) #s
 
-        if [[ $EXTERNAL_IP =~ $re ]]; then
-
-            break
-
-        else
-
-            echo && echo -e "${RED}Invalid IPv4 address format, try again.${NC}" && echo
-
-        fi
-
+    for target in "${remove[@]}"; do
+        for i in "${!array[@]}"; do
+            if [[ ${array[i]} = $target ]]; then
+                unset 'array[i]'
+            fi
+        done
     done
+
+    EXTERNAL_IP=$(echo "${array[@]}" | awk '{for(i=1;i<=NF;i++) print $i}' | awk '!x[$0]++' | grep -E -o $IPv4_STRING | head -n 1)
+
+    if ! [[ $EXTERNAL_IP =~ $re ]]; then
+
+        echo -e "${RED}Can't get external VPS IP automatically, only manual input possible." && echo
+
+        while true; do
+
+            read -rp 'VPS external IP: ' EXTERNAL_IP
+
+            ipv4_check=$(echo $EXTERNAL_IP | grep -E -o $IPv4_STRING)
+
+            if [[ $EXTERNAL_IP =~ $re ]]; then
+
+                break
+
+            else
+
+                echo && echo -e "${RED}Invalid IPv4 address format, try again.${NC}" && echo
+
+            fi
+
+        done
+    fi
+
+}
+
+function PrintInputs() {
 
     echo && echo -e "${RED}Private key:${NC} $PRIVAT_KEY"
     echo -e "${RED}External IP address:${NC} $EXTERNAL_IP"
@@ -341,7 +372,7 @@ function WaitForSync() {
 
 }
 
-function InstallationSuccesss() {
+function InstallationSuccessPrint() {
 
     echo && echo -e "${GREEN}Container syncronized with network.${NC}" && echo
     echo -e "${GREEN}Network last finalized block:${NC} $LFB"
@@ -359,7 +390,7 @@ function InstallationSuccesss() {
 
 }
 
-function MasternodeStatus() {
+function MasternodeStatusCheck() {
 
     echo && read -rp "Did you start masternode from your desktop wallet ? Ctrl-C to exit or any key to check status."
 
@@ -393,12 +424,16 @@ Annotation
 
 collateralIndex
 
-Inputs
+ReadMasternodePrivateKey
+
+ReadExternalIP
+
+PrintInputs
 
 InstallMaster
 
 WaitForSync
 
-InstallationSuccesss
+InstallationSuccessPrint
 
-MasternodeStatus
+MasternodeStatusCheck
