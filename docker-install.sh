@@ -135,7 +135,7 @@ function if_Docker() {
 
 function debian_installation() {
 
-    echo && echo -e "${RED}Next setup can take a long time, please take patience.${NC}"
+    echo && echo -e "${RED}Next setup can take a long time, please take patience.${NC}" && echo
 
     read -rp "Docker Debian installation. Ctrl-C to stop or any key to continue."
 
@@ -209,10 +209,9 @@ function distro() {
 
 function success() {
 
-    echo && echo -e "Copy paste this in to console:" && echo
-    echo -e "${GREEN}cd $HOME/"$COIN_NAME"-utils && ./master-install.sh${NC} and press enter." && echo
+    echo && echo -e "Copy paste this in to console and press enter:" && echo
+    echo -e "${GREEN}cd $HOME/"$COIN_NAME"-utils && ./master-install.sh${NC} " && echo
 
-    exit 0
 }
 
 if_Root
