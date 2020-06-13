@@ -183,6 +183,8 @@ function ubuntu_installation() {
 
     echo && echo -e "${GREEN}Docker successfully installed on your system.${NC}" && echo
 
+
+
 }
 
 function distro() {
@@ -211,6 +213,8 @@ function success() {
 
     echo && echo -e "Copy paste this in to console and press enter:" && echo
     echo -e "${GREEN}cd $HOME/"$COIN_NAME"-utils && ./master-install.sh${NC} " && echo
+
+    exit 0
 
 }
 

@@ -17,7 +17,7 @@ NC='\033[0m'
 
 if [[ $EUID -ne 0 ]]; then
 
-    echo && echo -e "${RED}WARNING: $0 must be run as root.${NC}" && echo
+    echo && echo -e "${RED}ERROR: $0 must be run as root.${NC}" && echo
 
     exit 1
 fi
@@ -85,8 +85,6 @@ function collateralIndex() {
     echo -e "To become guardian of DogeCash universe every node owner shall attain strong desire." && echo
     echo -e "Open desktop wallet, go to ${GREEN}RECEIVE${NC} tab and create new address." && echo
     echo -e "From the same  wallet send ${GREEN}exactly 5000 DogeCash${NC} to the address which just been created." && echo
-    echo -e "Now go to ${GREEN}HOME${NC} tab, you should see new transaction to your self in a history list." && echo
-    echo -e "Open the transaction details and look for ${GREEN}tx ID${NC}, see ?" && echo
 
     while true; do
 
