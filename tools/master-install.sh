@@ -124,7 +124,7 @@ function ReadWhatever() { # Assume our user is a dog, we need to return positive
 
                 if [ "${#collateral_txid}" = 64 ]; then # if we manage to get TX from function somewhere:
 
-                    echo && echo -e "${GREEN}Received transaction ID: $collateral_txid${NC}"
+                    echo && echo -e "Received transaction ID: ${GREEN}$collateral_txid${NC}"
 
                     WaitConfirmations # check for confirmations
 
@@ -379,13 +379,13 @@ function WaitConfirmations() {
 
         if [[ $confirmations -ge $rotten_tomato ]]; then
 
-            echo && echo -e "${CYAN}WARNING: $confirmations confirmations, transaction slightly old, maybe is a good idea to recreate.${NC}"
+            echo && echo -e "${CYAN}WARNING:${NC} $confirmations confirmations, transaction slightly old, maybe is a good idea to recreate."
 
             CollateralIndex
 
         else
 
-            echo && echo -e "${GREEN}Transaction confirmed $confirmations times, which is more then enough.${NC}"
+            echo && echo -e "Transaction confirmed ${GREEN}$confirmations${NC} times, which is more then enough."
 
             CollateralIndex
 
@@ -428,9 +428,13 @@ function CollateralIndex() {
 
     fi
 
-    echo && echo -e "Collateral transaction ID: ${RED}$collateral_txid${NC}" && echo
-    echo -e "Collateral Index: ${RED}$collateral_index${NC}" && echo
+    echo && echo -e "${GREEN}     ALL DATA VALID !${NC}"
+    echo -e "${CYAN}--------------------------${NC}"
+    echo -e "Collateral transaction ID: ${RED}$collateral_txid${NC}"
+    echo -e "Collateral Index: ${RED}$collateral_index${NC}                ${GREEN}^^${NC} If you provide TX as input still time to double check"
     echo -e "Confirmed: ${RED}$confirmations${NC}"
+   
+    echo -e "${CYAN}--------------------------${NC}"
 
     sleep 2
 
